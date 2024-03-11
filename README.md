@@ -1,4 +1,4 @@
-First attempt at a Chess game. Using Pygame and Python. Currently there is a prototypically functioning board and pieces. The command line will tell you the legal moves for a selected pawn or bishop, other pieces have yet to be worked out. Upcoming features include:
+First attempt at a Chess game. Using Pygame and Python. Currently there is a prototypically functioning board and pieces. The command line will tell you the legal moves for a selected pawn or bishop, other pieces have yet to be worked out. Currently any move can be made, legal or not. Upcoming features include:
 
 Legal move list for all pieces
 
