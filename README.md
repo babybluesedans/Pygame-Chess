@@ -1,24 +1,17 @@
-First attempt at a Chess game. Using Pygame and Python. Currently there is a prototypically functioning board and pieces. The command line will tell you the legal moves for a selected pawn or bishop, other pieces have yet to be worked out. Currently any move can be made, legal or not. Upcoming features include:
+Pygame chess and spaghetti python code. But it works.
 
-Legal move list for all pieces
-
-Pins added to legal moves
-
-Enforced legal moves
+Features to be added:
 
 Castling
 
 En Passant
 
-FullScreen or resizeable window
+Game styling
 
-Better UI
+Window resizing
 
-Visual dots representing legal moves for selected piece
+A reset button
 
-Move cancellation
+Sfx, visual and audio
 
-"AI" to play against
-
-Pieces sourced from https://opengameart.org/content/chess-pieces-and-board-squares
-All piece art credited to JohnPablok's improved Cburnett chess set.
+A window caption! Because I have yet to be bothered
