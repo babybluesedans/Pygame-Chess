@@ -1,4 +1,4 @@
-Pygame chess and spaghetti python code. But it works.
+Chess but its pygame! wow!!!! But it works.
 
 Features to be added:
 
