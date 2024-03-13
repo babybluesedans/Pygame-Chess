@@ -8,24 +8,22 @@ piece_size = piece_width, piece_height = int(square_size * .9), int(square_size 
 class GameState:
     def __init__(self):
         self.board = [
-        ["bR", "bN", "bB", "bK", "bQ", "bB", "bN", "bR"],
+        ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
         ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
         ["--", "--", "--", "--", "--", "--", "--", "--"],
         ["--", "--", "--", "--", "--", "--", "--", "--"],
         ["--", "--", "--", "--", "--", "--", "--", "--"],
         ["--", "--", "--", "--", "--", "--", "--", "--"],
         ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
-        ["wR", "wN", "wB", "wK", "wQ", "wB", "wN", "wR"]]
+        ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]]
         
         self.white_to_move = True
         self.white_in_check = False
         self.black_in_check = False
-        self.white_king_moved = False
-        self.black_king_moved = False
-        self.white_rook_left_moved = False
-        self.white_rook_right_moved = False
-        self.black_rook_left_moved = False
-        self.black_rook_right_moved = False
+        self.white_can_castle_KS = True
+        self.white_can_castle_QS = True
+        self.black_can_castle_KS = True
+        self.black_can_castle_QS = True
     
 class Piece: #for drawing purposes
     def __init__(self, image):

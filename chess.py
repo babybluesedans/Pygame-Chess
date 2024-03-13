@@ -17,15 +17,26 @@ board_top = height / 2 - board_size / 2
 blue = (13,120,219)
 gray = (99,161,219)
 black = (0, 0, 0)
+white = (255, 255, 255)
 square_size = board_size / 8
 piece_size = piece_width, piece_height = int(square_size * .9), int(square_size * .9)
 images = {}
+black_move_list = []
+white_move_list = []
+promotion_width = 300
+promotion_height = 85
+promotion_top = (height / 2) - (promotion_height / 2)
+promotion_left = (width / 2) - (promotion_width / 2)
+promotion_x_margin = (promotion_width - (square_size * 4)) / 5
+promotion_y_margin = (promotion_height - square_size) / 2
+promotion_piece_start = promotion_left + promotion_x_margin + (square_size / 2) - piece_width
+promotion_piece_gap = square_size + promotion_x_margin
 
 
 def load_images():
     pieces = ['wB', 'wK', 'wN', 'wP', 'wQ', 'wR', 'bB', 'bK', 'bN', 'bP', 'bQ', 'bR']
     for piece in pieces: 
-        images[piece] = p.transform.scale(p.image.load("pieces/" + piece + ".png"), (piece_size))
+        images[piece] = p.transform.scale(p.image.load("pieces/" + piece + ".png").convert_alpha(), (piece_size))
     
 
 def draw_pieces(screen, board, board_left, board_top):
@@ -432,61 +443,91 @@ def check_for_checks(board, white_list, black_list):
 
             
 def generate_legal_moves():
-    #get all legal moves
+    #get all possible moves
     analyze_board(game.board, white_pieces, black_pieces)
     #test all legal moves for whose in turn, delete any that result in check
     test_board = copy.deepcopy(game.board)
-    if game.white_to_move:
-        move_counter = 0
-        for piece in white_pieces:
-            #print(piece)
-            legal_moves = []
-            for move in piece.possible_moves: 
-                storage = test_board[move[0]][move[1]]
-                test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
-                test_board[piece.position[0]][piece.position[1]] = '--'
+    white_move_list.clear()
+    move_counter = 0
+    for piece in white_pieces:
+        #print(piece)
+        legal_moves = []
+        for move in piece.possible_moves: 
+            storage = test_board[move[0]][move[1]]
+            test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
+            test_board[piece.position[0]][piece.position[1]] = '--'
 
-                analyze_board(test_board, temp_white, temp_black)
-                check = check_for_checks(test_board, temp_white, temp_black)
-                if check == (0, 0) or check == (0, 1):
-                    legal_moves.append((move[0], move[1]))
-                
-                test_board[piece.position[0]][piece.position[1]] = test_board[move[0]][move[1]]
-                test_board[move[0]][move[1]] = storage
-            piece.possible_moves = legal_moves
+            analyze_board(test_board, temp_white, temp_black)
+            check = check_for_checks(test_board, temp_white, temp_black)
+            if check == (0, 0) or check == (0, 1):
+                legal_moves.append((move[0], move[1]))
+                white_move_list.append((move[0], move[1]))
+            
+            test_board[piece.position[0]][piece.position[1]] = test_board[move[0]][move[1]]
+            test_board[move[0]][move[1]] = storage
 
-        for piece in white_pieces:
-            if piece.possible_moves:
-                move_counter += 1
-        if move_counter == 0:
-            print("CHECKMATE!")
+        if piece.piece_type == "wK":
+            castling = can_castle(game.board)
+            if game.white_can_castle_QS:
+                if castling == (1, 0) or castling == (1, 1):
+                    legal_moves.append((7, 2))
+            if game.white_can_castle_KS:
+                if castling == (0, 1) or castling == (1, 1):
+                    legal_moves.append((7, 6))
+
+        piece.possible_moves = legal_moves
+        
+
+    for piece in white_pieces:
+        if piece.possible_moves:
+            move_counter += 1
+    if move_counter == 0:
+        if check_for_checks(game.board, white_pieces, black_pieces) == (0, 0):
+            print("Stalemate!")
+        else:
+            print("Checkmate!")
+            print("Black Wins!")
 
 
 
-    else:
-        if not game.white_to_move:
-            move_counter = 0
-            for piece in black_pieces:
-                legal_moves = []
-                for move in piece.possible_moves: 
-                    storage = test_board[move[0]][move[1]]
-                    test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
-                    test_board[piece.position[0]][piece.position[1]] = '--'
+    black_move_list.clear()
+    move_counter = 0
+    for piece in black_pieces:
+        legal_moves = []
+        for move in piece.possible_moves: 
+            storage = test_board[move[0]][move[1]]
+            test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
+            test_board[piece.position[0]][piece.position[1]] = '--'
 
-                    analyze_board(test_board, temp_white, temp_black)
-                    check = check_for_checks(test_board, temp_white, temp_black)
-                    if check == (1, 0) or check == (0, 0):
-                        legal_moves.append((move[0], move[1]))
-                    
-                    test_board[piece.position[0]][piece.position[1]] = test_board[move[0]][move[1]]
-                    test_board[move[0]][move[1]] = storage
-                piece.possible_moves = legal_moves
+            analyze_board(test_board, temp_white, temp_black)
+            check = check_for_checks(test_board, temp_white, temp_black)
+            if check == (1, 0) or check == (0, 0):
+                legal_moves.append((move[0], move[1]))
+                black_move_list.append((move[0], move[1]))
+            
+            test_board[piece.position[0]][piece.position[1]] = test_board[move[0]][move[1]]
+            test_board[move[0]][move[1]] = storage
+        
+        if piece.piece_type == "bK":
+            castling = can_castle(game.board)
+            if game.black_can_castle_QS:
+                if castling == (1, 0) or castling == (1, 1):
+                    legal_moves.append((0, 2))
+            if game.black_can_castle_KS:
+                if castling == (0, 1) or castling == (1, 1):
+                    legal_moves.append((0, 6))
 
-            for piece in black_pieces:
-                if piece.possible_moves:
-                    move_counter += 1
-            if move_counter == 0:
-                print("CHECKMATE!")
+        piece.possible_moves = legal_moves
+
+    for piece in black_pieces:
+        if piece.possible_moves:
+            move_counter += 1
+    if move_counter == 0:
+        if check_for_checks(game.board, white_pieces, black_pieces) == (0, 0):
+            print("Stalemate")
+        else:
+            print("Checkmate!")
+            print("White Wins!")
                 
     #determine which color to move, delete rest
     if game.white_to_move:
@@ -496,6 +537,7 @@ def generate_legal_moves():
     if not game.white_to_move:
         for piece in white_pieces:
             piece.possible_moves = []
+
 
 def is_move_legal(initial_y, initial_x, new_y, new_x):
     selected_piece = None
@@ -509,6 +551,170 @@ def is_move_legal(initial_y, initial_x, new_y, new_x):
     else:
         return False
 
+def castle_flags(y, x):
+    if (game.white_can_castle_KS or game.black_can_castle_KS or
+        game.white_can_castle_QS or game.black_can_castle_QS):
+        if game.board[y][x] == "wK":
+            game.white_can_castle_KS = False
+            game.white_can_castle_QS = False
+        if game.board[y][x] == "bK":
+            game.black_can_castle_KS = False
+            game.black_can_castle_QS = False
+        if y == 7 and x == 0:
+            game.white_can_castle_QS = False
+        if y == 7 and x == 7:
+            game.white_can_castle_KS = False
+        if y == 0 and x == 0:
+            game.black_can_castle_QS = False
+        if y == 0 and x == 7:
+            game.black_can_castle_KS = False
+
+def can_castle(board):#returns a tuple ([qs], [ks]) 1 or 0
+    if game.white_to_move == True:
+        ks = 1
+        qs = 1
+        for move in black_move_list:
+            if move == (7, 1) or move ==(7, 2) or move ==(7, 3):
+                print(f'test {move}')
+                qs = 0
+            if move == (7, 4) or move == (7, 5) or move == (7, 6):
+                print(f'test {move}')
+                ks = 0
+        for i in range(1, 4):
+            if board[7][i] != '--':
+                qs = 0
+        if game.board[7][5] != '--' or game.board[7][6] != '--':
+            ks = 0
+
+    else: 
+        ks = 1
+        qs = 1
+        for move in white_move_list:
+            if move == (0, 1) or move ==(0, 2) or move ==(0, 3):
+                qs = 0
+            if move == (0, 4) or move == (0, 5) or move == (0, 6):
+                ks = 0
+            
+        for i in range(1, 4):
+            if board[0][i] != '--':
+                qs = 0
+        if game.board[0][5] != '--' or game.board[0][6] != '--':
+            ks = 0
+
+    return (qs, ks)
+
+def is_move_castle(initial_y, initial_x, new_y, new_x):
+    piece = piece_type(game.board, initial_x, initial_y)
+    if piece == "wK" or piece == "bK":
+        if initial_x == 4 and new_x == 2:
+            return "qs"
+        if initial_x == 4 and new_x == 6:
+            return "ks"
+    return None
+
+def castle(side, y):
+    rook = None
+    if y == 7:
+        rook = "wR"
+        game.white_can_castle_KS = False
+        game.white_can_castle_QS = False
+    else:
+        rook = "bR"
+        game.black_can_castle_KS = False
+        game.black_can_castle_QS = False
+
+    if side == "qs":
+        game.board[y][3] = rook
+        game.board[y][0] = "--"
+    else:
+        print("test")
+        game.board[y][5] = rook
+        game.board[y][7] = "--"
+            
+
+def is_promotion(y, x):
+    piece = piece_type(game.board, x, y)
+    if piece == "wP" and y == 0:
+        print("test")
+        return True
+    if piece == "bP" and y == 7:
+        print("test")
+        return True
+    return False
+    
+def draw_promotion_popup():
+    p.draw.rect(screen, white, (promotion_left, promotion_top, promotion_width, promotion_height), 0, 10)
+    blue_gray = 0
+    if not game.white_to_move:
+        promotion_pieces = ["wQ", "wR", "wN", "wB"]
+    else:
+        promotion_pieces = ["bQ", "bR", "bN", "bB"]
+    for i in range(1, 5):
+        squares = i - 1
+        if blue_gray % 2 == 1:
+            color = blue
+        else:
+            color = gray
+        blue_gray += 1
+
+        p.draw.rect(screen, color, ((promotion_left + (promotion_x_margin * i) + (square_size 
+                                     * squares)), promotion_top + promotion_y_margin, square_size, square_size))
+        
+    for j in range(4):
+        draw_x = promotion_piece_start + (promotion_piece_gap * j) + (piece_width / 2)
+        draw_y = promotion_top + promotion_y_margin
+        new_piece = gs.Piece(images[promotion_pieces[j]])
+        screen.blit(new_piece.image, (draw_x, draw_y + 2))
+
+def choose_piece(mouse_x, mouse_y, x, y):
+    starting_square_left = width // 2 - promotion_left // 2 + promotion_x_margin
+    queen_x = (int(starting_square_left), int(starting_square_left + square_size))
+    rook_x = (int(queen_x[1] + promotion_x_margin), int(queen_x[1] + promotion_x_margin +square_size))
+    knight_x = (int(rook_x[1] + promotion_x_margin), int(rook_x[1] + promotion_x_margin +square_size))
+    bishop_x = (int(knight_x[1] + promotion_x_margin), int(knight_x[1] + promotion_x_margin +square_size))
+    piece_y = (int(promotion_top + promotion_y_margin), int(promotion_top + promotion_y_margin + square_size))
+    pieces = [queen_x, rook_x, knight_x, bishop_x]
+    color = find_color(game.board, x, y)
+    if color == "white":
+        piece_names = ["wQ", "wR", "wN", "wB"]
+    else:
+        piece_names = ["bQ", "bR", "bN", "bB"]    
+
+    i = 0
+    selected_piece = None
+
+    for piece in pieces:
+        if int(mouse_x) in range(piece[0], piece[1]) and int(mouse_y) in range(piece_y[0], piece_y[1]):
+            selected_piece = piece_names[i] 
+        i += 1
+    
+    if selected_piece == None:
+        return False
+
+    match selected_piece:
+        case "wQ":
+            game.board[y][x] = "wQ"
+        case "wR":
+            game.board[y][x] = "wR"
+        case "wN":
+            game.board[y][x] = "wN"
+        case "wB":
+            game.board[y][x] = "wB"
+        case "bQ":
+            game.board[y][x] = "bQ"
+        case "bR":
+            game.board[y][x] = "bR"
+        case "bN":
+            game.board[y][x] = "bN"
+        case "bB":
+            game.board[y][x] = "bB"
+    return True
+
+
+
+
+
+
 
 game = gs.GameState()
 load_images()
@@ -521,12 +727,13 @@ white_pieces = []
 temp_white = []
 temp_black = []
 generate_legal_moves()
+promotion = False
 
 while running:
     for event in p.event.get():
         if event.type == p.QUIT:
             running = False
-        elif event.type == p.MOUSEBUTTONDOWN and event.button == 1:
+        elif event.type == p.MOUSEBUTTONDOWN and event.button == 1 and not promotion:
             location = p.mouse.get_pos()
             if not square_selected_flag:
                 square_selected = find_square(*location)
@@ -534,11 +741,22 @@ while running:
             else:
                 new_square = find_square(*location)
                 if is_move_legal(square_selected[1], square_selected[0], new_square[1], new_square[0]):
+                    side = is_move_castle(square_selected[1], square_selected[0], new_square[1], new_square[0])
+                    castle_flags(square_selected[1], square_selected[0])
                     game.board[new_square[1]][new_square[0]] = game.board[square_selected[1]][square_selected[0]]
                     game.board[square_selected[1]][square_selected[0]] = "--"
+                    promotion = is_promotion(new_square[1], new_square[0])
+                    if side != None:
+                        castle(side, square_selected[1])
+
                     game.white_to_move = not game.white_to_move
                     generate_legal_moves()
                 square_selected_flag = False
+        elif event.type == p.MOUSEBUTTONDOWN and event.button == 1 and promotion:
+            location = p.mouse.get_pos()
+            if choose_piece(location[0], location[1], new_square[0], new_square[1]):
+                promotion = False
+                generate_legal_moves()
     
     screen.fill("black")
     draw_board(screen)
@@ -546,6 +764,8 @@ while running:
 
     if square_selected_flag:
         draw_legal_moves((square_selected[1], square_selected[0]))
+    if promotion:
+        draw_promotion_popup()
 
     p.display.flip()
     clock.tick(60)

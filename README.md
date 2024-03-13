@@ -1,22 +1,14 @@
-First attempt at a Chess game. Using Pygame and Python. Currently there is a prototypically functioning board and pieces. The command line will tell you the legal moves for a selected pawn or bishop, other pieces have yet to be worked out. Currently any move can be made, legal or not. Upcoming features include:
-
-Legal move list for all pieces
-
-Pins added to legal moves
-
-Enforced legal moves
-
-Castling
+First attempt at a chess game. Little messy but its working well. Functional board, enforced legal moves, checkmate/stalemate broadcasted from the terminal. Upcoming features include:
 
 En Passant
 
 FullScreen or resizeable window
 
+Piece art options/board options
+
+Board flipping
+
 Better UI
-
-Visual dots representing legal moves for selected piece
-
-Move cancellation
 
 "AI" to play against
 
