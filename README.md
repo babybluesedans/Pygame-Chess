@@ -10,7 +10,6 @@ Board flipping
 
 Better UI
 
-"AI" to play against
+A window caption! Because I have yet to be bothered
 
-Pieces sourced from https://opengameart.org/content/chess-pieces-and-board-squares
-All piece art credited to JohnPablok's improved Cburnett chess set.
+Chess piece credits to JohnPablok's improved Cburnett chess set from opengameart.org
