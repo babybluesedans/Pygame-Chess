@@ -131,24 +131,24 @@ def pawn_moves(board, color, x, y):#
             if board[y - 1][x] != '--':
                 illegal_white_pawn_moves.append((y - 1, x))
                 illegal_white_pawn_moves.append((y - 2, x))
-            if x > 0:
-                if board[y - 1][x - 1] != '--':
-                    if find_color(board, x - 1, y - 1) == color:
-                        illegal_white_pawn_moves.append((y - 1, x - 1))
-                else: 
+        if x > 0:
+            if board[y - 1][x - 1] != '--':
+                if find_color(board, x - 1, y - 1) == color:
                     illegal_white_pawn_moves.append((y - 1, x - 1))
+            else: 
+                illegal_white_pawn_moves.append((y - 1, x - 1))
+        else:
+                illegal_white_pawn_moves.append((y - 1, x - 1))
+        if x < 7:
+            if board[y - 1][x + 1] != '--':
+                if find_color(board, x + 1, y - 1) == color:
+                    illegal_white_pawn_moves.append((y - 1, x + 1))
             else:
-                    illegal_white_pawn_moves.append((y - 1, x - 1))
-            if x < 7:
-                if board[y - 1][x + 1] != '--':
-                    if find_color(board, x + 1, y - 1) == color:
-                        illegal_white_pawn_moves.append((y - 1, x + 1))
-                else:
-                        illegal_white_pawn_moves.append((y - 1, x + 1))
-            else:
-                illegal_white_pawn_moves.append((y - 1, x + 1))
-            if y != 6:
-                illegal_white_pawn_moves.append((y - 2, x))
+                    illegal_white_pawn_moves.append((y - 1, x + 1))
+        else:
+            illegal_white_pawn_moves.append((y - 1, x + 1))
+        if y != 6:
+            illegal_white_pawn_moves.append((y - 2, x))
         set1 = set(legal_white_pawn_moves)
         set2 = set(illegal_white_pawn_moves)
         legal_white_pawn_moves = list(set1.symmetric_difference(set2))
@@ -160,24 +160,24 @@ def pawn_moves(board, color, x, y):#
             if board[y + 1][x] != '--':
                 illegal_black_pawn_moves.append((y + 1, x))
                 illegal_black_pawn_moves.append((y + 2, x))
-            if x > 0:
-                if board[y + 1][x - 1] != '--':
-                    if find_color(board, x - 1, y + 1) == color:
-                        illegal_black_pawn_moves.append((y + 1, x - 1))
-                else: 
+        if x > 0:
+            if board[y + 1][x - 1] != '--':
+                if find_color(board, x - 1, y + 1) == color:
                     illegal_black_pawn_moves.append((y + 1, x - 1))
-            else:
+            else: 
                 illegal_black_pawn_moves.append((y + 1, x - 1))
-            if x < 7:
-                if board[y + 1][x + 1] != '--':
-                    if find_color(board, x + 1, y + 1) == color:
-                        illegal_black_pawn_moves.append((y + 1, x + 1))
-                else:
+        else:
+            illegal_black_pawn_moves.append((y + 1, x - 1))
+        if x < 7:
+            if board[y + 1][x + 1] != '--':
+                if find_color(board, x + 1, y + 1) == color:
                     illegal_black_pawn_moves.append((y + 1, x + 1))
             else:
                 illegal_black_pawn_moves.append((y + 1, x + 1))
-            if y != 1:
-                illegal_black_pawn_moves.append((y + 2, x))
+        else:
+            illegal_black_pawn_moves.append((y + 1, x + 1))
+        if y != 1:
+            illegal_black_pawn_moves.append((y + 2, x))
         set1 = set(legal_black_pawn_moves)
         set2 = set(illegal_black_pawn_moves)
         legal_black_pawn_moves = list(set1.symmetric_difference(set2))    
@@ -459,7 +459,7 @@ def generate_legal_moves():
     game.en_passant_possible = False
     for piece in white_pieces:
         #print(piece)
-        legal_moves = []
+        white_legal_moves = []
         if piece.piece_type == "wP":
             if last_move_to == (piece.position[0], piece.position[1] - 1):
                 if piece.position[0] == 3:
@@ -484,26 +484,12 @@ def generate_legal_moves():
             analyze_board(test_board, temp_white, temp_black)
             check = check_for_checks(test_board, temp_white, temp_black)
             if check == (0, 0) or check == (0, 1):
-                legal_moves.append((move[0], move[1]))
+                white_legal_moves.append((move[0], move[1]))
                 white_move_list.append((move[0], move[1]))
             
             test_board[piece.position[0]][piece.position[1]] = test_board[move[0]][move[1]]
             test_board[move[0]][move[1]] = storage
 
-        if piece.piece_type == "wK":
-            castling = can_castle(game.board)
-            if game.white_can_castle_QS:
-                if castling == (1, 0) or castling == (1, 1):
-                    legal_moves.append((7, 2))
-            if game.white_can_castle_KS:
-                if castling == (0, 1) or castling == (1, 1):
-                    legal_moves.append((7, 6))
-        
-
-
-
-        piece.possible_moves = legal_moves
-        
 
     for piece in white_pieces:
         if piece.possible_moves:
@@ -520,7 +506,7 @@ def generate_legal_moves():
     black_move_list.clear()
     move_counter = 0
     for piece in black_pieces:
-        legal_moves = []
+        black_legal_moves = []
         if piece.piece_type == "bP":
             if last_move_to == (piece.position[0], piece.position[1] - 1):
                 if piece.position[0] == 4:
@@ -545,22 +531,34 @@ def generate_legal_moves():
             analyze_board(test_board, temp_white, temp_black)
             check = check_for_checks(test_board, temp_white, temp_black)
             if check == (1, 0) or check == (0, 0):
-                legal_moves.append((move[0], move[1]))
+                black_legal_moves.append((move[0], move[1]))
                 black_move_list.append((move[0], move[1]))
             
             test_board[piece.position[0]][piece.position[1]] = test_board[move[0]][move[1]]
             test_board[move[0]][move[1]] = storage
         
+
+    piece.possible_moves = black_legal_moves
+    piece.possible_moves = white_legal_moves
+    for piece in white_pieces + black_pieces:
+        if piece.piece_type == "wK":
+            castling = can_castle(game.board)
+            if game.white_can_castle_QS:
+                if castling == (1, 0) or castling == (1, 1):
+                    piece.possible_moves.append((7, 2))
+            if game.white_can_castle_KS:
+                if castling == (0, 1) or castling == (1, 1):
+                    piece.possible_moves.append((7, 6))
+        
         if piece.piece_type == "bK":
             castling = can_castle(game.board)
             if game.black_can_castle_QS:
                 if castling == (1, 0) or castling == (1, 1):
-                    legal_moves.append((0, 2))
+                    piece.possible_moves.append((0, 2))
             if game.black_can_castle_KS:
                 if castling == (0, 1) or castling == (1, 1):
-                    legal_moves.append((0, 6))
+                    piece.possible_moves.append((0, 6))
 
-        piece.possible_moves = legal_moves
 
     for piece in black_pieces:
         if piece.possible_moves:
@@ -617,23 +615,23 @@ def can_castle(board):#returns a tuple ([qs], [ks]) 1 or 0
         ks = 1
         qs = 1
         for move in black_move_list:
-            if move == (7, 1) or move ==(7, 2) or move ==(7, 3):
-                print(f'test {move}')
+            print(f"MOVES {move}")
+            if move ==(7, 2) or move ==(7, 3) or move == (7,4):
                 qs = 0
             if move == (7, 4) or move == (7, 5) or move == (7, 6):
-                print(f'test {move}')
                 ks = 0
         for i in range(1, 4):
             if board[7][i] != '--':
                 qs = 0
         if game.board[7][5] != '--' or game.board[7][6] != '--':
             ks = 0
+        print(f"KS {ks}")
 
     else: 
         ks = 1
         qs = 1
         for move in white_move_list:
-            if move == (0, 1) or move ==(0, 2) or move ==(0, 3):
+            if move ==(0, 2) or move ==(0, 3) or move == (0, 4):
                 qs = 0
             if move == (0, 4) or move == (0, 5) or move == (0, 6):
                 ks = 0
