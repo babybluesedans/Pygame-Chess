@@ -454,6 +454,7 @@ def generate_legal_moves():
     test_board = copy.deepcopy(game.board)
     white_move_list.clear()
     move_counter = 0
+    game.en_passant_possible = False
     for piece in white_pieces:
         #print(piece)
         legal_moves = []
@@ -463,12 +464,16 @@ def generate_legal_moves():
                     if piece_type(game.board, last_move_to[1], last_move_to[0]) == "bP":
                         if last_move_from[0] == 1:
                             piece.possible_moves.append((piece.position[0] - 1, piece.position[1] - 1))
+                            game.en_passant_possible = True
+                            print("true")
         if piece.piece_type == "wP":
             if last_move_to == (piece.position[0], piece.position[1] + 1):
                 if piece.position[0] == 3:
                     if piece_type(game.board, last_move_to[1], last_move_to[0]) == "bP":
                         if last_move_from[0] == 1:
                             piece.possible_moves.append((piece.position[0] - 1, piece.position[1] + 1))
+                            game.en_passant_possible = True
+                            print("true")
         for move in piece.possible_moves: 
             storage = test_board[move[0]][move[1]]
             test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
@@ -520,12 +525,16 @@ def generate_legal_moves():
                     if piece_type(game.board, last_move_to[1], last_move_to[0]) == "wP":
                         if last_move_from[0] == 6:
                             piece.possible_moves.append((piece.position[0] + 1, piece.position[1] - 1))
+                            game.en_passant_possible = True
+                            print("true")
         if piece.piece_type == "bP":
             if last_move_to == (piece.position[0], piece.position[1] + 1):
                 if piece.position[0] == 4:
                     if piece_type(game.board, last_move_to[1], last_move_to[0]) == "wP":
                         if last_move_from[0] == 6:
                             piece.possible_moves.append((piece.position[0] + 1, piece.position[1] + 1))
+                            game.en_passant_possible = True
+                            print("true")
         for move in piece.possible_moves: 
             storage = test_board[move[0]][move[1]]
             test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
@@ -646,6 +655,7 @@ def is_move_castle(initial_y, initial_x, new_y, new_x):
 
 def castle(side, y):
     rook = None
+    print(test)
     if y == 7:
         rook = "wR"
         game.white_can_castle_KS = False
@@ -743,21 +753,24 @@ def choose_piece(mouse_x, mouse_y, x, y):
     return True
 
 def is_move_en_passant(initial_y, initial_x, new_y, new_x):
-    if game.white_to_move == True:
-        if last_move_from[0] == 1 and last_move_to[0] == 3:
-            if (new_y, new_x) == (initial_y - 1, initial_x - 1):
-                return "white"
-            if (new_y, new_x) == (initial_y - 1, initial_x + 1):
-                return "white"
-    else:
-        if last_move_from[0] == 6 and last_move_to[0] == 4:
-            if (new_y, new_x) == (initial_y + 1, initial_x - 1):
-                return "black"
-            if (new_y, new_x) == (initial_y + 1, initial_x + 1):
-                return "black"
+    piece = piece_type(game.board, initial_x, initial_y)
+    if (piece == "wP" or piece == "bP") and game.en_passant_possible:
+        if game.white_to_move == True:
+            if last_move_from[0] == 1 and last_move_to[0] == 3:
+                if (new_y, new_x) == (initial_y - 1, initial_x - 1):
+                    return "white"
+                if (new_y, new_x) == (initial_y - 1, initial_x + 1):
+                    return "white"
+        else:
+            if last_move_from[0] == 6 and last_move_to[0] == 4:
+                if (new_y, new_x) == (initial_y + 1, initial_x - 1):
+                    return "black"
+                if (new_y, new_x) == (initial_y + 1, initial_x + 1):
+                    return "black"
     return None
 
 def en_passant(color, x, y):
+    print("test en")
     if color == "white":
         game.board[y + 1][x] = '--'
     else:
@@ -799,7 +812,9 @@ while running:
                     color = find_color(game.board, square_selected[0], square_selected[1])
                     castle_flags(square_selected[1], square_selected[0])
                     last_move_to = (new_square[1], new_square[0])
+                    print(last_move_to)
                     last_move_from = (square_selected[1], square_selected[0])
+                    print(last_move_from)
                     game.board[new_square[1]][new_square[0]] = game.board[square_selected[1]][square_selected[0]]
                     game.board[square_selected[1]][square_selected[0]] = "--"
                     promotion = is_promotion(new_square[1], new_square[0])
