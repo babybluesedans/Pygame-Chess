@@ -127,9 +127,10 @@ def pawn_moves(board, color, x, y):#
         if y >= 2:
             if board[y - 2][x] != '--':
                 illegal_white_pawn_moves.append((y - 2, x))
-        if board[y - 1][x] != '--':
-            illegal_white_pawn_moves.append((y - 1, x))
-            illegal_white_pawn_moves.append((y - 2, x))
+        if y >= 1:
+            if board[y - 1][x] != '--':
+                illegal_white_pawn_moves.append((y - 1, x))
+                illegal_white_pawn_moves.append((y - 2, x))
         if x > 0:
             if board[y - 1][x - 1] != '--':
                 if find_color(board, x - 1, y - 1) == color:
@@ -155,9 +156,10 @@ def pawn_moves(board, color, x, y):#
         if y <= 5:
             if board[y + 2][x] != '--':
                 illegal_black_pawn_moves.append((y + 2, x))
-        if board[y + 1][x] != '--':
-            illegal_black_pawn_moves.append((y + 1, x))
-            illegal_black_pawn_moves.append((y + 2, x))
+        if y <= 6:
+            if board[y + 1][x] != '--':
+                illegal_black_pawn_moves.append((y + 1, x))
+                illegal_black_pawn_moves.append((y + 2, x))
         if x > 0:
             if board[y + 1][x - 1] != '--':
                 if find_color(board, x - 1, y + 1) == color:
@@ -655,7 +657,6 @@ def is_move_castle(initial_y, initial_x, new_y, new_x):
 
 def castle(side, y):
     rook = None
-    print(test)
     if y == 7:
         rook = "wR"
         game.white_can_castle_KS = False
@@ -669,7 +670,6 @@ def castle(side, y):
         game.board[y][3] = rook
         game.board[y][0] = "--"
     else:
-        print("test")
         game.board[y][5] = rook
         game.board[y][7] = "--"
             
@@ -677,10 +677,8 @@ def castle(side, y):
 def is_promotion(y, x):
     piece = piece_type(game.board, x, y)
     if piece == "wP" and y == 0:
-        print("test")
         return True
     if piece == "bP" and y == 7:
-        print("test")
         return True
     return False
     
@@ -770,7 +768,6 @@ def is_move_en_passant(initial_y, initial_x, new_y, new_x):
     return None
 
 def en_passant(color, x, y):
-    print("test en")
     if color == "white":
         game.board[y + 1][x] = '--'
     else:
