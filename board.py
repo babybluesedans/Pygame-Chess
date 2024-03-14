@@ -1,5 +1,5 @@
 import sys
-import pygame as p_type
+import pygame as p
 import pieces
 import copy
 
