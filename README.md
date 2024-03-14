@@ -1,6 +1,5 @@
 First attempt at a chess game. Little messy but its working well. Functional board, enforced legal moves, checkmate/stalemate broadcasted from the terminal. Upcoming features include:
-
-En Passant
+Code organization(lol)
 
 FullScreen or resizeable window
 

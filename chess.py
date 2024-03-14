@@ -31,6 +31,9 @@ promotion_x_margin = (promotion_width - (square_size * 4)) / 5
 promotion_y_margin = (promotion_height - square_size) / 2
 promotion_piece_start = promotion_left + promotion_x_margin + (square_size / 2) - piece_width
 promotion_piece_gap = square_size + promotion_x_margin
+last_move_to = (0, 0)
+last_move_from = (0, 0)
+
 
 
 def load_images():
@@ -121,8 +124,9 @@ def pawn_moves(board, color, x, y):#
     illegal_black_pawn_moves = []
 
     if color == "white":
-        if board[y - 2][x] != '--':
-            illegal_white_pawn_moves.append((y - 2, x))
+        if y >= 2:
+            if board[y - 2][x] != '--':
+                illegal_white_pawn_moves.append((y - 2, x))
         if board[y - 1][x] != '--':
             illegal_white_pawn_moves.append((y - 1, x))
             illegal_white_pawn_moves.append((y - 2, x))
@@ -148,8 +152,9 @@ def pawn_moves(board, color, x, y):#
         set2 = set(illegal_white_pawn_moves)
         legal_white_pawn_moves = list(set1.symmetric_difference(set2))
     else:
-        if board[y + 2][x] != '--':
-            illegal_black_pawn_moves.append((y + 2, x))
+        if y <= 5:
+            if board[y + 2][x] != '--':
+                illegal_black_pawn_moves.append((y + 2, x))
         if board[y + 1][x] != '--':
             illegal_black_pawn_moves.append((y + 1, x))
             illegal_black_pawn_moves.append((y + 2, x))
@@ -452,6 +457,18 @@ def generate_legal_moves():
     for piece in white_pieces:
         #print(piece)
         legal_moves = []
+        if piece.piece_type == "wP":
+            if last_move_to == (piece.position[0], piece.position[1] - 1):
+                if piece.position[0] == 3:
+                    if piece_type(game.board, last_move_to[1], last_move_to[0]) == "bP":
+                        if last_move_from[0] == 1:
+                            piece.possible_moves.append((piece.position[0] - 1, piece.position[1] - 1))
+        if piece.piece_type == "wP":
+            if last_move_to == (piece.position[0], piece.position[1] + 1):
+                if piece.position[0] == 3:
+                    if piece_type(game.board, last_move_to[1], last_move_to[0]) == "bP":
+                        if last_move_from[0] == 1:
+                            piece.possible_moves.append((piece.position[0] - 1, piece.position[1] + 1))
         for move in piece.possible_moves: 
             storage = test_board[move[0]][move[1]]
             test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
@@ -474,6 +491,9 @@ def generate_legal_moves():
             if game.white_can_castle_KS:
                 if castling == (0, 1) or castling == (1, 1):
                     legal_moves.append((7, 6))
+        
+
+
 
         piece.possible_moves = legal_moves
         
@@ -494,6 +514,18 @@ def generate_legal_moves():
     move_counter = 0
     for piece in black_pieces:
         legal_moves = []
+        if piece.piece_type == "bP":
+            if last_move_to == (piece.position[0], piece.position[1] - 1):
+                if piece.position[0] == 4:
+                    if piece_type(game.board, last_move_to[1], last_move_to[0]) == "wP":
+                        if last_move_from[0] == 6:
+                            piece.possible_moves.append((piece.position[0] + 1, piece.position[1] - 1))
+        if piece.piece_type == "bP":
+            if last_move_to == (piece.position[0], piece.position[1] + 1):
+                if piece.position[0] == 4:
+                    if piece_type(game.board, last_move_to[1], last_move_to[0]) == "wP":
+                        if last_move_from[0] == 6:
+                            piece.possible_moves.append((piece.position[0] + 1, piece.position[1] + 1))
         for move in piece.possible_moves: 
             storage = test_board[move[0]][move[1]]
             test_board[move[0]][move[1]] = test_board[piece.position[0]][piece.position[1]]
@@ -710,6 +742,27 @@ def choose_piece(mouse_x, mouse_y, x, y):
             game.board[y][x] = "bB"
     return True
 
+def is_move_en_passant(initial_y, initial_x, new_y, new_x):
+    if game.white_to_move == True:
+        if last_move_from[0] == 1 and last_move_to[0] == 3:
+            if (new_y, new_x) == (initial_y - 1, initial_x - 1):
+                return "white"
+            if (new_y, new_x) == (initial_y - 1, initial_x + 1):
+                return "white"
+    else:
+        if last_move_from[0] == 6 and last_move_to[0] == 4:
+            if (new_y, new_x) == (initial_y + 1, initial_x - 1):
+                return "black"
+            if (new_y, new_x) == (initial_y + 1, initial_x + 1):
+                return "black"
+    return None
+
+def en_passant(color, x, y):
+    if color == "white":
+        game.board[y + 1][x] = '--'
+    else:
+        game.board[y - 1][x] = '--'
+    
 
 
 
@@ -741,13 +794,19 @@ while running:
             else:
                 new_square = find_square(*location)
                 if is_move_legal(square_selected[1], square_selected[0], new_square[1], new_square[0]):
+                    en_p = is_move_en_passant(square_selected[1], square_selected[0], new_square[1], new_square[0])
                     side = is_move_castle(square_selected[1], square_selected[0], new_square[1], new_square[0])
+                    color = find_color(game.board, square_selected[0], square_selected[1])
                     castle_flags(square_selected[1], square_selected[0])
+                    last_move_to = (new_square[1], new_square[0])
+                    last_move_from = (square_selected[1], square_selected[0])
                     game.board[new_square[1]][new_square[0]] = game.board[square_selected[1]][square_selected[0]]
                     game.board[square_selected[1]][square_selected[0]] = "--"
                     promotion = is_promotion(new_square[1], new_square[0])
                     if side != None:
                         castle(side, square_selected[1])
+                    if en_p != None:
+                        en_passant(color, new_square[0], new_square[1])
 
                     game.white_to_move = not game.white_to_move
                     generate_legal_moves()
