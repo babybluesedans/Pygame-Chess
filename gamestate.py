@@ -24,6 +24,7 @@ class GameState:
         self.white_can_castle_QS = True
         self.black_can_castle_KS = True
         self.black_can_castle_QS = True
+        self.en_passant_possible = False
     
 class Piece: #for drawing purposes
     def __init__(self, image):
