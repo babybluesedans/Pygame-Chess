@@ -21,5 +21,5 @@ promotion_y_margin = None
 promotion_piece_start = None
 promotion_piece_gap = None
 
-def recalculate_dimensions(new_width, new_height):
+def recalculate_dimensions(new_width, new_height): # Recalculates game dimensions if the screen size is updated
     pass
