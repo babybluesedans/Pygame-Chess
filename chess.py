@@ -131,24 +131,24 @@ def pawn_moves(board, color, x, y):#
             if board[y - 1][x] != '--':
                 illegal_white_pawn_moves.append((y - 1, x))
                 illegal_white_pawn_moves.append((y - 2, x))
-        if x > 0:
-            if board[y - 1][x - 1] != '--':
-                if find_color(board, x - 1, y - 1) == color:
+            if x > 0:
+                if board[y - 1][x - 1] != '--':
+                    if find_color(board, x - 1, y - 1) == color:
+                        illegal_white_pawn_moves.append((y - 1, x - 1))
+                else: 
                     illegal_white_pawn_moves.append((y - 1, x - 1))
-            else: 
-                illegal_white_pawn_moves.append((y - 1, x - 1))
-        else:
-                illegal_white_pawn_moves.append((y - 1, x - 1))
-        if x < 7:
-            if board[y - 1][x + 1] != '--':
-                if find_color(board, x + 1, y - 1) == color:
-                    illegal_white_pawn_moves.append((y - 1, x + 1))
             else:
-                    illegal_white_pawn_moves.append((y - 1, x + 1))
-        else:
-            illegal_white_pawn_moves.append((y - 1, x + 1))
-        if y != 6:
-            illegal_white_pawn_moves.append((y - 2, x))
+                    illegal_white_pawn_moves.append((y - 1, x - 1))
+            if x < 7:
+                if board[y - 1][x + 1] != '--':
+                    if find_color(board, x + 1, y - 1) == color:
+                        illegal_white_pawn_moves.append((y - 1, x + 1))
+                else:
+                        illegal_white_pawn_moves.append((y - 1, x + 1))
+            else:
+                illegal_white_pawn_moves.append((y - 1, x + 1))
+            if y != 6:
+                illegal_white_pawn_moves.append((y - 2, x))
         set1 = set(legal_white_pawn_moves)
         set2 = set(illegal_white_pawn_moves)
         legal_white_pawn_moves = list(set1.symmetric_difference(set2))
@@ -160,24 +160,24 @@ def pawn_moves(board, color, x, y):#
             if board[y + 1][x] != '--':
                 illegal_black_pawn_moves.append((y + 1, x))
                 illegal_black_pawn_moves.append((y + 2, x))
-        if x > 0:
-            if board[y + 1][x - 1] != '--':
-                if find_color(board, x - 1, y + 1) == color:
+            if x > 0:
+                if board[y + 1][x - 1] != '--':
+                    if find_color(board, x - 1, y + 1) == color:
+                        illegal_black_pawn_moves.append((y + 1, x - 1))
+                else: 
                     illegal_black_pawn_moves.append((y + 1, x - 1))
-            else: 
+            else:
                 illegal_black_pawn_moves.append((y + 1, x - 1))
-        else:
-            illegal_black_pawn_moves.append((y + 1, x - 1))
-        if x < 7:
-            if board[y + 1][x + 1] != '--':
-                if find_color(board, x + 1, y + 1) == color:
+            if x < 7:
+                if board[y + 1][x + 1] != '--':
+                    if find_color(board, x + 1, y + 1) == color:
+                        illegal_black_pawn_moves.append((y + 1, x + 1))
+                else:
                     illegal_black_pawn_moves.append((y + 1, x + 1))
             else:
                 illegal_black_pawn_moves.append((y + 1, x + 1))
-        else:
-            illegal_black_pawn_moves.append((y + 1, x + 1))
-        if y != 1:
-            illegal_black_pawn_moves.append((y + 2, x))
+            if y != 1:
+                illegal_black_pawn_moves.append((y + 2, x))
         set1 = set(legal_black_pawn_moves)
         set2 = set(illegal_black_pawn_moves)
         legal_black_pawn_moves = list(set1.symmetric_difference(set2))    
