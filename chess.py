@@ -1,4 +1,3 @@
-import sys
 import pygame as p
 from math import sqrt
 import gamestate as gs

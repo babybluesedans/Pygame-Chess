@@ -1,4 +1,3 @@
-import sys
 import pygame as p
 import pieces
 import copy
@@ -24,13 +23,14 @@ class Board:
             self.white_can_castle_QS = True
             self.black_can_castle_KS = True
             self.black_can_castle_QS = True
+            self.move_log = []
         else:
             self.board = copy.deepcopy(board.board)
         
     def move(self): # Move a piece to a square, update old square, move aux piece (castling, etc)
         pass
 
-    def generate_legal_moves(self): # View moves for each piece and determine if it results in check
+    def generate_legal_moves(self): # View moves for each piece and determine if they result in check
         pass
 
     def look_for_checks(self): # Looks at board and sees if a check is active

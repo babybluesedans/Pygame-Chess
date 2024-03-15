@@ -1,6 +1,3 @@
-import sys
-
-
 class Piece:
     def __init__(self, color, position, piece_type):
         self.color = color
@@ -22,7 +19,7 @@ class Pawn(Piece):
     def promotion(self): # Determines if a move is a promotion
         pass
 
-class Knight(Pieces):
+class Knight(Piece):
     def knight_moves(self): # Determines possible moves for a knight at that location
         pass
 
@@ -42,7 +39,7 @@ class Queen(Piece):
         pass
 
 class King(Piece):
-     def king_moves(self): # Determines possible moves for King at that location 
+    def king_moves(self): # Determines possible moves for King at that location 
         pass
 
     def king_castling(self): # Determines if king can castle and which side/amends king move list

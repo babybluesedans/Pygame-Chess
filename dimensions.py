@@ -1,18 +1,18 @@
 SQUARES = 64
 SQUARES_SIDE = 8
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
 GRAY = None
 BLUE = None
 
 
 
 screen_size = width, height = 800, 600
-board_size = None
-square_size = None
-board_left = None
-board_top = None
-piece_size = piece_width, piece_height = None, None
+board_size = int(width * .625)
+while board_size % 8 != 0:
+    board_size += 1
+square_size = board_size // 8
+board_left = width // 2 - (board_size // 2)
+board_top = height // 2 - (board_size // 2)
+piece_size = int(square_size * .9)
 promotion_size = promotion_width, promotion_height = None, None
 promotion_left = None
 promotion_top = None

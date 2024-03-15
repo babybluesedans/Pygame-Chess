@@ -1,4 +1,3 @@
-import sys 
 import pygame as p
 
 board_flip = False
