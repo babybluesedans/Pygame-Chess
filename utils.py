@@ -1,4 +1,5 @@
 import pygame as p
+import dimensions as dim
 
 
 files = ["a", "b", "c", "d", "e", "f", "g", "h"]
@@ -19,11 +20,28 @@ def coords_to_notation(y, x):
     return (file, rank)
 
 def find_color(board, y, x): # Determines color of piece from coordinates. Returns None if no piece exists
-    pass
+    piece = board[y][x]
+    if piece[0] == "w":
+        return "white"
+    else:
+        return "black"
 
 def find_type(board, y, x): # Determines type of a piece from coordinates, Returns None if no piece exists
     pass
 
-def find_coords(screen_x, screen_y): # Determines square that is clicked, returns (y, x) 
-    pass
+def find_coords(screen_x, screen_y): 
+    """Determines square that is clicked, returns (y, x)
+    EX: find_coords(350, 175) == (3, 2)""" 
+    x_margin = (dim.width - dim.board_size) // 2
+    y_margin = (dim.height - dim.board_size) // 2
+    x = screen_x - x_margin
+    y = screen_y - y_margin
+    x_square = x // dim.square_size
+    y_square = y // dim.square_size
+    return (y_square, x_square)
+
+def find_screen_position(y, x):
+    y_coord = (y * dim.square_size) + dim.board_top
+    x_coord = (x * dim.square_size) + dim.board_left
+    return (x_coord, y_coord)
 
