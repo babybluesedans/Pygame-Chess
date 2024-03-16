@@ -16,6 +16,7 @@ gui.load_images(images)
 
 running = True
 square_selected = False
+piece = None
 
 while running:
     for event in p.event.get():
@@ -27,6 +28,7 @@ while running:
                 square = utils.find_coords(*location)
                 board.update_pieces()
                 square_selected = True
+                piece = board.find_piece(*square)
             else:
                 new_square = utils.find_coords(*location)
                 board.move(*square, *new_square)
@@ -37,8 +39,7 @@ while running:
     screen.fill(gui.BLACK)
     board_sprite.draw_board(screen)
     gui.draw_pieces(screen, board.board, images)
-    if square_selected:
-        piece = board.find_piece(*square)
+    if square_selected and piece != None:
         gui.draw_legal_moves(screen, board, piece.legal_moves)
 
     p.display.flip()

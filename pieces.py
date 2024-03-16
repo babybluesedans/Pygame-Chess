@@ -22,7 +22,8 @@ class Pawn(Piece):
         super().__init__(color, position, piece_type, board)
         self.possible_moves = self.pawn_moves()
 
-    def pawn_moves(self): # Determines possible moves for pawn at that position
+    def pawn_moves(self): 
+        """Determines possible moves for pawn at that position"""
         self.possible_moves.clear()
         if self.color == "white":
             if self.y >= 1:

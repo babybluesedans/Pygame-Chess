@@ -19,7 +19,9 @@ def coords_to_notation(y, x):
     rank = ranks[y]
     return (file, rank)
 
-def find_color(board, y, x): # Determines color of piece from coordinates. Returns None if no piece exists
+def find_color(board, y, x): 
+    """Determines color of piece from coordinates
+    EX: find_color(board, (3, 2)) == "white"""
     piece = board[y][x]
     if piece[0] == "w":
         return "white"
@@ -41,6 +43,8 @@ def find_coords(screen_x, screen_y):
     return (y_square, x_square)
 
 def find_screen_position(y, x):
+    """Takes 2D list coordinates (y, x) and returns pixel coordinates (x, y)
+    EX find_screen_position(3, 2) == (350, 175)"""
     y_coord = (y * dim.square_size) + dim.board_top
     x_coord = (x * dim.square_size) + dim.board_left
     return (x_coord, y_coord)

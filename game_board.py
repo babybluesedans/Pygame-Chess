@@ -31,7 +31,9 @@ class Board:
         else:
             self.board = copy.deepcopy(board.board)
         
-    def move(self, initial_y, initial_x, new_y, new_x, special=None): # Move a piece to a square, update old square, move aux piece (castling, etc)
+    def move(self, initial_y, initial_x, new_y, new_x, special=None): 
+        """Move a piece to a square, update old square, move aux piece (castling, etc)
+        Takes (y, x) of old square, (y, x) of new square, and special move arguement"""
         self.board[new_y][new_x] = self.board[initial_y][initial_x]
         if special == None:
             self.board[initial_y][initial_x] = '--' 
@@ -43,6 +45,8 @@ class Board:
         pass
 
     def update_pieces(self):
+        """Clears pieces lists, iterates board, constructs each piece and their moves, 
+        adds them to their respective lists"""
         self.white_pieces.clear()
         self.black_pieces.clear()
         for rank in range(dim.SQUARES_SIDE):
@@ -77,6 +81,7 @@ class Board:
                         self.black_pieces.append(new_piece)
 
     def find_piece(self, y, x):
+        """Searches piece lists and returns piece type as (y, x) location"""
         for piece in self.white_pieces + self.black_pieces:
             if piece.position == (y, x):
                 return piece

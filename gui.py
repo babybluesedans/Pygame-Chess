@@ -63,6 +63,8 @@ def draw_pieces(screen, board, images):
         y_square += dim.square_size
 
 def draw_legal_moves(screen, board, legal_moves):
+    """Takes a list of legal squares for a piece as arguement, draws circles
+    on those squares"""
     for move in legal_moves:
         screen_pos = utils.find_screen_position(*move)
         x = screen_pos[0] + dim.square_size // 2
