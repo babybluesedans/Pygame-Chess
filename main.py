@@ -49,7 +49,8 @@ while running:
     gui.draw_pieces(screen, board.board, images)
     if square_selected and piece != None:
         gui.draw_legal_moves(screen, board, piece.legal_moves)
-    gui.draw_promotion_popup(screen, board, images)
+    if promotion:
+        gui.draw_promotion_popup(screen, board, images)
 
     p.display.flip()
 
