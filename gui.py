@@ -17,6 +17,7 @@ class BoardSprite:
     def __init__(self, color_light, color_dark):
         self.color_light = color_light
         self.color_dark = color_dark
+
     
     def draw_board(self, screen):
         """Draws board on screen at dimensions. Takes surface as arguement"""
@@ -35,6 +36,7 @@ class BoardSprite:
                 x += dim.square_size * 2
             square_i += 1
             y += dim.square_size
+
             
 def load_images(images):
     """Loads images to their name in an 'images' dictionary"""
@@ -62,6 +64,7 @@ def draw_pieces(screen, board, images):
             x_square += dim.square_size
         y_square += dim.square_size
 
+
 def draw_legal_moves(screen, board, legal_moves):
     """Takes a list of legal squares for a piece as arguement, draws circles
     on those squares"""
@@ -70,3 +73,37 @@ def draw_legal_moves(screen, board, legal_moves):
         x = screen_pos[0] + dim.square_size // 2
         y = screen_pos[1] + dim.square_size //2
         p.draw.circle(screen, BLACK, (x, y), dim.piece_size / 3, width = 5)
+
+def draw_promotion_popup(screen, board, images):
+    p.draw.rect(screen, WHITE, (dim.promotion_left, #Draw background
+                                dim.promotion_top,
+                                dim.promotion_width,
+                                dim.promotion_height), 0, 10)
+    color_alt = 0
+    if not board.white_to_move:
+        promotion_pieces = ["wQ", "wR", "wN", "wB"]
+    else:
+        promotion_pieces = ["bQ", "bR", "bN", "bB"]
+    for i in range(1, 5): #Alternate Squares
+        squares = i - 1
+        if color_alt % 2 == 1:
+            color = BLUE
+        else:
+            color = LIGHT_BLUE
+        color_alt += 1
+        p.draw.rect(screen, color, ((dim.promotion_left + #Draw squares
+                                     (dim.promotion_x_margin * i) +
+                                     (dim.square_size * squares)), 
+                                     dim.promotion_top + 
+                                     dim.promotion_y_margin, 
+                                     dim.square_size,
+                                     dim.square_size))
+    for j in range(4):
+        x = dim.promotion_piece_start + ((dim.promotion_piece_gap * j) +
+                                         dim.piece_size / 2)
+        y = dim.promotion_top + dim.promotion_y_margin
+        new_piece = PieceSprite(images[promotion_pieces[j]])
+        screen.blit(new_piece.image, (x, y + 3))
+
+        
+    

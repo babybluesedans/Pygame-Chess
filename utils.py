@@ -5,19 +5,21 @@ import dimensions as dim
 files = ["a", "b", "c", "d", "e", "f", "g", "h"]
 ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
-def notation_to_coords(file, rank): 
+def notation_to_coords(notation): 
     """Converts chess notation ("a", "4") to coordinates on the board instance (y, x).
     EX: notation_to_coords("a", "5") == (3, 0)"""
-    y = ranks.index(rank)
-    x = files.index(file)
+    y = ranks.index(notation[1])
+    x = files.index(notation[0])
     return (y, x)
 
+
 def coords_to_notation(y, x): 
-    """Converts coordinates (y, x) to chess notation ("4, "a"). 
+    """Converts coordinates (y, x) to chess notation ("a", "4"). 
     EX: coord_to_notation(3, 0) == ("a", "4")"""
     file = files[x]
     rank = ranks[y]
-    return (file, rank)
+    return f"{file}{rank}"
+
 
 def find_color(board, y, x): 
     """Determines color of piece from coordinates
@@ -28,8 +30,6 @@ def find_color(board, y, x):
     else:
         return "black"
 
-def find_type(board, y, x): # Determines type of a piece from coordinates, Returns None if no piece exists
-    pass
 
 def find_coords(screen_x, screen_y): 
     """Determines square that is clicked, returns (y, x)
@@ -41,6 +41,7 @@ def find_coords(screen_x, screen_y):
     x_square = x // dim.square_size
     y_square = y // dim.square_size
     return (y_square, x_square)
+
 
 def find_screen_position(y, x):
     """Takes 2D list coordinates (y, x) and returns pixel coordinates (x, y)

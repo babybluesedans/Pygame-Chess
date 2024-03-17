@@ -17,6 +17,7 @@ gui.load_images(images)
 running = True
 square_selected = False
 piece = None
+board.generate_legal_moves()
 
 while running:
     for event in p.event.get():
@@ -26,21 +27,29 @@ while running:
             location = p.mouse.get_pos()
             if not square_selected:
                 square = utils.find_coords(*location)
-                board.update_pieces()
                 square_selected = True
-                piece = board.find_piece(*square)
+                piece = board.find_piece_from_coords(*square)
+                if piece == None:
+                    square_selected = False
             else:
                 new_square = utils.find_coords(*location)
-                board.move(*square, *new_square)
-                square_selected = False
+                if board.move_is_legal(piece, *new_square):
+                    board.update_castling_flags(piece)
+                    board.special_moves(piece, *new_square)
+                    board.update_move_log(piece, *new_square)
+                    board.move(*square, *new_square)
+                    square_selected = False
+                    board.white_to_move = not board.white_to_move
+                    board.generate_legal_moves()
+                else:
+                    square_selected = False
 
-
-            
     screen.fill(gui.BLACK)
     board_sprite.draw_board(screen)
     gui.draw_pieces(screen, board.board, images)
     if square_selected and piece != None:
         gui.draw_legal_moves(screen, board, piece.legal_moves)
+    gui.draw_promotion_popup(screen, board, images)
 
     p.display.flip()
 

@@ -1,6 +1,12 @@
 import pygame as p
 import utils
+import pieces
+import game_board as gb
 
-test = utils.notation_to_coords("a", "5")
+board = gb.Board
 
-test2 = utils.coords_to_notation(2, 3)
+new_pawn = pieces.Pawn("black", (1, 1), "bP", board)
+
+new_knight = pieces.Knight("black", (1, 2), "bN", board)
+
+new_knight.test_method()

@@ -834,6 +834,7 @@ while running:
         draw_legal_moves((square_selected[1], square_selected[0]))
     if promotion:
         draw_promotion_popup()
+    draw_promotion_popup()
 
     p.display.flip()
     clock.tick(60)
