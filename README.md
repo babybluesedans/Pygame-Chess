@@ -1,7 +1,7 @@
 Requirements:
 pygame
 
-Usage:
+Entry Point:
 main.py
 
 First attempt at a chess game. Game rendered using Pygame. Legal moves enforced, move log in terminal Upcoming features include:
