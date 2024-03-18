@@ -1,3 +1,9 @@
+Requirements:
+pygame
+
+Usage:
+main.py
+
 First attempt at a chess game. Game rendered using Pygame. Legal moves enforced, move log in terminal Upcoming features include:
 
 FullScreen or resizeable window
