@@ -75,6 +75,9 @@ def draw_legal_moves(screen, board, legal_moves):
         p.draw.circle(screen, BLACK, (x, y), dim.piece_size / 3, width = 5)
 
 def draw_promotion_popup(screen, board, images):
+    """Draws the promotion popup and populates the clickable rects list
+    for the promotion click processor. takes surface, board, and images list
+    as arguements"""
     p.draw.rect(screen, WHITE, (dim.promotion_left, #Draw background
                                 dim.promotion_top,
                                 dim.promotion_width,
@@ -84,6 +87,10 @@ def draw_promotion_popup(screen, board, images):
         promotion_pieces = ["wQ", "wR", "wN", "wB"]
     else:
         promotion_pieces = ["bQ", "bR", "bN", "bB"]
+    if not dim.promotion_rects:
+        rects_added = False
+    else:
+        rects_added = True
     for i in range(1, 5): #Alternate Squares
         squares = i - 1
         if color_alt % 2 == 1:
@@ -98,6 +105,18 @@ def draw_promotion_popup(screen, board, images):
                                      dim.promotion_y_margin, 
                                      dim.square_size,
                                      dim.square_size))
+        
+        if not rects_added:
+            dim.promotion_rects.append((dim.promotion_left +
+                                       (dim.promotion_x_margin * i) + 
+                                       (dim.square_size * squares), 
+                                       dim.promotion_top + 
+                                       dim.promotion_y_margin))
+            last_added = len(dim.promotion_rects) - 1
+            dim.promotion_rects.append((dim.promotion_rects[last_added][0] + 
+                                           dim.square_size, 
+                                           dim.promotion_rects[last_added][1] +
+                                           dim.square_size))
     for j in range(4):
         x = dim.promotion_piece_start + ((dim.promotion_piece_gap * j) +
                                          dim.piece_size / 2)
@@ -106,4 +125,18 @@ def draw_promotion_popup(screen, board, images):
         screen.blit(new_piece.image, (x, y + 3))
 
         
+def proccess_promotion_click(mouse_x, mouse_y):
+    """Compares user click to promotion window piece rects to return
+    which piece is being selected. Returns 0 - 3 and takes mouse coords
+    as arguement"""
+    i = 0
+    while i < 8:
+        if dim.promotion_rects[i][0] < mouse_x < dim.promotion_rects[i + 1][0]:
+            if dim.promotion_rects[i][1] < mouse_y < dim.promotion_rects[i + 1][1]:
+                if i == 0:
+                    return 0
+                else:
+                    return i // 2
+        i += 2
+
     

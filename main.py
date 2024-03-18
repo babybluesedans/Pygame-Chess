@@ -18,6 +18,7 @@ running = True
 square_selected = False
 piece = None
 board.generate_legal_moves()
+promotion = False
 
 while running:
     for event in p.event.get():
@@ -25,24 +26,32 @@ while running:
             running = False
         elif event.type == p.MOUSEBUTTONDOWN and event.button == 1:
             location = p.mouse.get_pos()
-            if not square_selected:
-                square = utils.find_coords(*location)
-                square_selected = True
-                piece = board.find_piece_from_coords(*square)
-                if piece == None:
-                    square_selected = False
-            else:
-                new_square = utils.find_coords(*location)
-                if board.move_is_legal(piece, *new_square):
-                    board.update_castling_flags(piece)
-                    board.special_moves(piece, *new_square)
-                    board.update_move_log(piece, *new_square)
-                    board.move(*square, *new_square)
-                    square_selected = False
-                    board.white_to_move = not board.white_to_move
+            if promotion:
+                piece = gui.proccess_promotion_click(*location)
+                if piece != None:
+                    board.promotion(*new_square, piece)
+                    promotion = False
                     board.generate_legal_moves()
+            else:
+                if not square_selected:
+                    square = utils.find_coords(*location)
+                    square_selected = True
+                    piece = board.find_piece_from_coords(*square)
+                    if piece == None:
+                        square_selected = False
                 else:
-                    square_selected = False
+                    new_square = utils.find_coords(*location)
+                    if board.move_is_legal(piece, *new_square):
+                        board.update_castling_flags(piece)
+                        promotion = board.is_move_promotion(piece, *new_square)
+                        board.special_moves(piece, *new_square)
+                        board.move(*square, *new_square)
+                        square_selected = False
+                        board.white_to_move = not board.white_to_move
+                        board.generate_legal_moves()
+                        board.update_move_log(piece)
+                    else:
+                        square_selected = False
 
     screen.fill(gui.BLACK)
     board_sprite.draw_board(screen)

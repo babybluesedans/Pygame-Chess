@@ -1,9 +1,5 @@
 SQUARES = 64
 SQUARES_SIDE = 8
-GRAY = None
-BLUE = None
-
-
 
 screen_size = width, height = 800, 600
 board_size = int(width * .625)
@@ -22,6 +18,7 @@ promotion_y_margin = (promotion_height - square_size) / 2
 promotion_piece_start = promotion_left + promotion_x_margin + ((square_size / 2)
                                                                 - piece_size)
 promotion_piece_gap = square_size + promotion_x_margin
+promotion_rects = []
 
 def recalculate_dimensions(new_width, new_height): # Recalculates game dimensions if the screen size is updated
     pass

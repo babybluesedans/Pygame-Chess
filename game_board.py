@@ -18,8 +18,11 @@ class Board:
         ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]]
 
         self.white_to_move = True
-        self.black_check = False
-        self.white_check = False
+        self.black_checked = False
+        self.white_checked = False
+        self.black_checkmated = False
+        self.white_checkmated = False
+        self.game_stalemate = False
         self.white_can_castle_KS = True
         self.white_can_castle_QS = True
         self.black_can_castle_KS = True
@@ -29,13 +32,19 @@ class Board:
         self.black_pieces = []
         self.castling_QS = False
         self.castling_KS = False
+        self.last_move = ()
+        self.en_passant = False
+        self.capture = False
 
     
     def move(self, initial_y, initial_x, new_y, new_x): 
         """Move a piece to a square, update old square, move aux piece (castling, etc)
         Takes (y, x) of old square, (y, x) of new square"""
+        if self.board[new_y][new_x] != '--':
+            self.capture = True
         self.board[new_y][new_x] = self.board[initial_y][initial_x]
         self.board[initial_y][initial_x] = '--' 
+        self.last_move = ((initial_y, initial_x,), (new_y, new_x))
 
 
     def generate_legal_moves(self):
@@ -43,18 +52,20 @@ class Board:
         and looks if that move results in check. If not, it appends the move to that pieces
         legal move list. Also checks white_to_move status/check status and updates moves accordingly"""
         self.update_pieces()
+        move_counter = 0
 
         checks = self.look_for_checks()
         if checks[0] == True:
-            self.white_check = True
+            self.white_checked = True
         else:
-            self.white_check = False
+            self.white_checked = False
         if checks[1] == True:
-            self.black_check = True
+            self.black_checked = True
         else:
-            self.black_check = False
+            self.black_checked = False
 
         self.castling_move_generator()
+        self.en_passant_generator()
         test_board_instance = copy.deepcopy(self)
         test_board = test_board_instance.board
         
@@ -70,8 +81,14 @@ class Board:
                     check = test_board_instance.look_for_checks()
                     if check[0] == False:
                         piece.legal_moves.append(move)
+                        move_counter += 1
                     test_board_instance.move(*move, *piece.position)
                     test_board[y][x] = temp_square
+            if move_counter == 0:
+                if self.white_checked == True:
+                    self.white_checkmated = True
+                else:
+                    self.game_stalemate = True
         else:
             for piece in self.black_pieces:
                 piece.legal_moves.clear()
@@ -84,8 +101,14 @@ class Board:
                     check = test_board_instance.look_for_checks()
                     if check[1] == False:
                         piece.legal_moves.append(move)
+                        move_counter += 1
                     test_board_instance.move(*move, *piece.position)
                     test_board[y][x] = temp_square
+            if move_counter == 0:
+                if self.black_checked == True:
+                    self.black_checkmated = True
+                else:
+                    self.game_stalemate = True
 
                 
     def look_for_checks(self):
@@ -164,26 +187,25 @@ class Board:
             return False
 
 
-    def update_move_log(self, piece, new_y, new_x):
+    def update_move_log(self, piece):
         """Constructs a move log entry based on move. Takes piece object
         and new square coords as arguements"""
         message = ""
-
-        if self.board[new_y][new_x] != '--':
-            capture = True
-        else:
-            capture = False
+        if self.en_passant:
+            self.capture = True
 
         if piece.symbol == "P":
-            if capture:
+            if self.capture:
                 message += (piece.notation[0])
+                self.en_passant = False
         else:
             message += (piece.symbol)
 
-        if capture:
+        if self.capture:
             message += ("x")
+            self.capture = False
         
-        message += (utils.coords_to_notation(new_y, new_x))
+        message += (utils.coords_to_notation(*self.last_move[1]))
 
         if self.castling_QS:
             message = 'O-O-O'
@@ -191,8 +213,15 @@ class Board:
         if self.castling_KS:
             message = 'O-O'
             self.castling_KS = False
+        
+        if self.white_checked or self.black_checked:
+            if self.white_checkmated or self.black_checkmated:
+                message += ('#')
+            else:
+                message += ('+')
 
         self.move_log.append(message)
+        print(message)
         piece.move_log.append(message)
     
 
@@ -308,6 +337,93 @@ class Board:
                     self.board[new_y][3] = "wR"
                 else:
                     self.board[new_y][3] = "bR"
+        #en passant
+        if piece.symbol == "P":
+            if new_x == piece.x + 1 or new_x == piece.x - 1:
+                if self.board[new_y][new_x] == '--':
+                    if self.white_to_move:
+                        self.board[new_y + 1][new_x] = '--'
+                    else:
+                        self.board[new_y - 1][new_x] = '--'
+                    self.en_passant = True
+    
+    def is_move_promotion(self, piece, new_y, new_x):
+        """Detects if a move is promotion for promotion event.
+        Takes piece object and move coords as arguements"""
+        if piece.symbol == "P":
+            if new_y == 0 or new_y == 7:
+                return True
+        return False
+    
+    def promotion(self, new_y, new_x, new_piece):
+        """Actually swaps a piece for promtion. Takes move
+        coords and piece selection (0-3) from promotion processor as
+        arguements"""
+        piece = ''
+        if not self.white_to_move:
+            piece += 'w'
+        else:
+            piece += 'b'
+        match new_piece:
+            case 0:
+                piece += 'Q' 
+                self.board[new_y][new_x] = piece
+            case 1:
+                piece += 'R'
+                self.board[new_y][new_x] = piece
+            case 2:
+                piece += 'N'  
+                self.board[new_y][new_x] = piece
+            case 3:
+                piece += "B"
+                self.board[new_y][new_x] = piece
+
+    def en_passant_generator(self):
+        """Checks if white pawn has a pawn next to it that just moved its first
+        two squares, then adds en passant to its possible moves."""
+        if not self.move_log:
+            return
+        square = None
+        last_move_index = len(self.move_log) - 1
+        for piece in self.white_pieces:
+            if piece.y == 3 and piece.piece_type == "wP":
+                possible_squares = []
+                if piece.x < 7:
+                    square = (piece.y, piece.x + 1)
+                    square = utils.coords_to_notation(*square)
+                    possible_squares.append(square)
+                if piece.x > 0:
+                    square = (piece.y, piece.x - 1)
+                    square = utils.coords_to_notation(*square)
+                    possible_squares.append(square)
+                if self.move_log[last_move_index] in possible_squares:
+                    coords = utils.notation_to_coords(self.move_log[last_move_index])
+                    black_piece = self.find_piece_from_coords(*coords)
+                    if black_piece.piece_type == "bP":
+                        if self.last_move[0][0] == 1:
+                            piece.possible_moves.append((black_piece.y - 1, black_piece.x))
+
+        for piece in self.black_pieces:
+            if piece.y == 4 and piece.piece_type == "bP":
+                possible_squares = []
+                if piece.x < 7:
+                    square = (piece.y, piece.x + 1)
+                    square = utils.coords_to_notation(*square)
+                    possible_squares.append(square)
+                if piece.x > 0:
+                    square = (piece.y, piece.x - 1)
+                    square = utils.coords_to_notation(*square)
+                    possible_squares.append(square)
+                if self.move_log[last_move_index] in possible_squares:
+                    coords = utils.notation_to_coords(self.move_log[last_move_index])
+                    white_piece = self.find_piece_from_coords(*coords)
+                    if white_piece.piece_type == "wP":
+                        if self.last_move[0][0] == 6:
+                            piece.possible_moves.append((white_piece.y + 1, white_piece.x))
+                
+
+                        
+            
         
 
 
