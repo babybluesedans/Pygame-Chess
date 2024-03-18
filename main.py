@@ -1,18 +1,18 @@
 import pygame as p
 import dimensions as dim
 import game_board
-import pieces
 import game
 import gui
 import utils
 
 board_sprite = gui.BoardSprite(gui.LIGHT_BLUE, gui.BLUE)
-screen = p.display.set_mode(dim.screen_size)
+screen = p.display.set_mode((dim.screen_size), p.RESIZABLE)
 clock = p.time.Clock()
 images = {}
 board = game_board.Board()
 
 gui.load_images(images)
+circle = gui.load_circle()
 
 running = True
 square_selected = False
@@ -24,6 +24,13 @@ while running:
     for event in p.event.get():
         if event.type == p.QUIT:
             running = False
+        elif event.type == p.WINDOWSIZECHANGED:
+            new_width = screen.get_width()
+            new_height = screen.get_height()
+            gui.recalculate_dimensions(new_width, new_height)
+            board_sprite = gui.BoardSprite(gui.LIGHT_BLUE, gui.BLUE)
+            gui.load_images(images)
+            circle = gui.load_circle()
         elif event.type == p.MOUSEBUTTONDOWN and event.button == 1:
             location = p.mouse.get_pos()
             if promotion:
@@ -57,7 +64,7 @@ while running:
     board_sprite.draw_board(screen)
     gui.draw_pieces(screen, board.board, images)
     if square_selected and piece != None:
-        gui.draw_legal_moves(screen, board, piece.legal_moves)
+        gui.draw_legal_moves(screen, board, piece.legal_moves, circle)
     if promotion:
         gui.draw_promotion_popup(screen, board, images)
 

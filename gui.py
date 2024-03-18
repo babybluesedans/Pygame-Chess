@@ -39,12 +39,16 @@ class BoardSprite:
 
             
 def load_images(images):
-    """Loads images to their name in an 'images' dictionary"""
+    """Loads images to their name in an 'images' dictionary and a circle into a circle variable"""
     pieces = ['wB', 'wK', 'wN', 'wP', 'wQ', 'wR', 'bB', 'bK', 'bN', 'bP', 'bQ', 'bR']
     for piece in pieces: 
-        images[piece] = p.transform.scale(p.image.load("pieces/" + piece + ".png").convert_alpha(),
+        images[piece] = p.transform.smoothscale(p.image.load("pieces/" + piece + ".png").convert_alpha(),
                                                       (dim.piece_size, dim.piece_size))
     
+def load_circle():
+    circle = p.transform.smoothscale(p.image.load("pieces/move_circle.png"),
+                                    (dim.piece_size * .8 , dim.piece_size * .8))
+    return circle
             
 def draw_pieces(screen, board, images):
     """Nested for loop through a board 2D list that drawsthe piece that is
@@ -65,14 +69,16 @@ def draw_pieces(screen, board, images):
         y_square += dim.square_size
 
 
-def draw_legal_moves(screen, board, legal_moves):
+def draw_legal_moves(screen, board, legal_moves, circle):
     """Takes a list of legal squares for a piece as arguement, draws circles
     on those squares"""
+    circle_rect = circle.get_rect()
+    square_margin = (dim.square_size - circle_rect.width) // 2
     for move in legal_moves:
         screen_pos = utils.find_screen_position(*move)
-        x = screen_pos[0] + dim.square_size // 2
-        y = screen_pos[1] + dim.square_size //2
-        p.draw.circle(screen, BLACK, (x, y), dim.piece_size / 3, width = 5)
+        x = screen_pos[0]
+        y = screen_pos[1]
+        screen.blit(circle, (x + square_margin, y + square_margin))
 
 def draw_promotion_popup(screen, board, images):
     """Draws the promotion popup and populates the clickable rects list
@@ -138,5 +144,25 @@ def proccess_promotion_click(mouse_x, mouse_y):
                 else:
                     return i // 2
         i += 2
+
+def recalculate_dimensions(new_width, new_height): # Recalculates game dimensions if the screen size is updated
+    dim.screen_size = dim.width, dim.height = new_width, new_height
+    dim.board_size = int(dim.height * .9)
+    while dim.board_size % 8 != 0:
+        dim.board_size += 1
+    dim.square_size = dim.board_size // 8
+    dim.board_left = dim.width // 2 - (dim.board_size // 2)
+    dim.board_top = dim.height // 2 - (dim.board_size // 2)
+    dim.piece_size = int(dim.square_size * .9)
+    dim.promotion_size = dim.promotion_width, dim.promotion_height = (int(dim.board_size * .6),
+                                                        int(dim.board_size * .15))
+    dim.promotion_left = (dim.width // 2) - (dim.promotion_width // 2)
+    dim.promotion_top = (dim.height // 2) - (dim.promotion_height // 2)
+    dim.promotion_x_margin = (dim.promotion_width - (dim.square_size * 4)) / 5
+    dim.promotion_y_margin = (dim.promotion_height - dim.square_size) / 2
+    dim.promotion_piece_start = dim.promotion_left + dim.promotion_x_margin + ((dim.square_size / 2)
+                                                                    - dim.piece_size)
+    dim.promotion_piece_gap = dim.square_size + dim.promotion_x_margin
+    dim.promotion_rects = []
 
     
