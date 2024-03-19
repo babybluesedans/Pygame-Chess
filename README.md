@@ -4,7 +4,7 @@ pygame
 Entry Point:
 main.py
 
-First attempt at a chess game. Game rendered using Pygame. Legal moves enforced, move log, castling, en passant, the whole shebang Upcoming features include:
+First attempt at a chess game. Game rendered using Pygame. Legal moves enforced, move log, castling, en passant, the whole shebang. Upcoming features include:
 
 Piece art options/board options
 
