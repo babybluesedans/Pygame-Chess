@@ -5,8 +5,11 @@ import game
 import gui
 import utils
 
+p.init()
+
 board_sprite = gui.BoardSprite(gui.LIGHT_BLUE, gui.BLUE)
 screen = p.display.set_mode((dim.screen_size), p.RESIZABLE)
+p.display.set_caption("chess :)")
 clock = p.time.Clock()
 images = {}
 board = game_board.Board()
@@ -19,6 +22,7 @@ square_selected = False
 piece = None
 board.generate_legal_moves()
 promotion = False
+
 
 while running:
     for event in p.event.get():
@@ -34,10 +38,12 @@ while running:
         elif event.type == p.MOUSEBUTTONDOWN and event.button == 1:
             location = p.mouse.get_pos()
             if promotion:
-                piece = gui.proccess_promotion_click(*location)
-                if piece != None:
-                    board.promotion(*new_square, piece)
+                promo_piece = gui.proccess_promotion_click(*location)
+                if promo_piece != None:
+                    board.promotion(*new_square, promo_piece)
                     promotion = False
+                    new_piece = board.find_piece_from_coords(*new_square)
+                    board.update_move_log(piece)
                     board.generate_legal_moves()
             else:
                 if not square_selected:
@@ -55,8 +61,9 @@ while running:
                         board.move(*square, *new_square)
                         square_selected = False
                         board.white_to_move = not board.white_to_move
-                        board.generate_legal_moves()
-                        board.update_move_log(piece)
+                        if not promotion:
+                            board.generate_legal_moves()
+                            board.update_move_log(piece)
                     else:
                         square_selected = False
 
@@ -67,6 +74,7 @@ while running:
         gui.draw_legal_moves(screen, board, piece.legal_moves, circle)
     if promotion:
         gui.draw_promotion_popup(screen, board, images)
+    gui.display_moves(screen, board.move_display)
 
     p.display.flip()
 

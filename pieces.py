@@ -10,12 +10,8 @@ class Piece:
         self.symbol = piece_type[1]
         self.board = board
         self.piece_type = piece_type
-        self.move_log = []
         self.possible_moves = [] # Moves that a piece can physically move to
         self.legal_moves = [] # Moves that a piece can physically move to AND that do not result in check
-
-    def change_type(self): # Changes type of piece (promotion)
-        pass
 
     def __str__(self):
         return f"{self.color} {self.piece_type} at {self.position}"

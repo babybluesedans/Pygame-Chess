@@ -1,7 +1,8 @@
 import pygame as p
 import dimensions as dim
 import utils
-
+p.init()
+font = p.font.Font(None, 40)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (13, 120, 219)
@@ -145,9 +146,11 @@ def proccess_promotion_click(mouse_x, mouse_y):
                     return i // 2
         i += 2
 
-def recalculate_dimensions(new_width, new_height): # Recalculates game dimensions if the screen size is updated
+def recalculate_dimensions(new_width, new_height):
+    """Recalculates game dimensions if the screen size is updated.
+    Takes screen width and height as arguements"""
     dim.screen_size = dim.width, dim.height = new_width, new_height
-    dim.board_size = int(dim.height * .9)
+    dim.board_size = int(dim.height * .8)
     while dim.board_size % 8 != 0:
         dim.board_size += 1
     dim.square_size = dim.board_size // 8
@@ -164,5 +167,18 @@ def recalculate_dimensions(new_width, new_height): # Recalculates game dimension
                                                                     - dim.piece_size)
     dim.promotion_piece_gap = dim.square_size + dim.promotion_x_margin
     dim.promotion_rects = []
+    dim.move_log_top = dim.board_size + ((dim.height - dim.board_size) *.65)
+
+def display_moves(screen, display_log):
+    message = "Move Log:  "
+    for move in display_log:
+        message += f"{move}  "
+    if len(display_log) >= 6:
+        message += '...' 
+    message_surface = font.render(message, True, WHITE)
+    message_rect = message_surface.get_rect()
+    message_rect.topleft = (dim.board_left, dim.move_log_top)
+    screen.blit(message_surface, message_rect)
+    
 
     

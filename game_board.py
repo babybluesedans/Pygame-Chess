@@ -28,6 +28,7 @@ class Board:
         self.black_can_castle_KS = True
         self.black_can_castle_QS = True
         self.move_log = []
+        self.move_display = []
         self.white_pieces = []
         self.black_pieces = []
         self.castling_QS = False
@@ -35,7 +36,7 @@ class Board:
         self.last_move = ()
         self.en_passant = False
         self.capture = False
-
+        self.promotion_piece = ""
     
     def move(self, initial_y, initial_x, new_y, new_x): 
         """Move a piece to a square, update old square, move aux piece (castling, etc)
@@ -219,10 +220,16 @@ class Board:
                 message += ('#')
             else:
                 message += ('+')
+        if self.promotion_piece:
+            message += f"={self.promotion_piece}"
+            self.promotion_piece = ""
+
 
         self.move_log.append(message)
+        self.move_display.insert(0, message)
+        if len(self.move_display) > 6:
+            self.move_display.pop()
         print(message)
-        piece.move_log.append(message)
     
 
     def update_castling_flags(self, piece):
@@ -250,6 +257,8 @@ class Board:
         """Checks if there are pieces in the way of castling, then checks if the
         king would be in check during his castling journey. Updates possible moves accordingly"""
         #white
+        qs = False
+        ks = False
         ks_pieces = [(7, 5), (7, 6)]
         ks_checks = [(7, 4), (7, 5), (7, 6)]
         qs_pieces = [(7, 1), (7, 2), (7, 3)]
@@ -278,10 +287,12 @@ class Board:
                         ks = False
         if qs:
             king = self.find_piece_from_coords(7, 4)
-            king.possible_moves.append((7, 2))
+            if king != None:
+                king.possible_moves.append((7, 2))
         if ks:
             king = self.find_piece_from_coords(7, 4)
-            king.possible_moves.append((7, 6))
+            if king != None:
+                king.possible_moves.append((7, 6))
 
         #black
         qs_pieces = [(0, 1), (0, 2), (0, 3)]
@@ -312,10 +323,12 @@ class Board:
                         ks = False
         if qs:
             king = self.find_piece_from_coords(0, 4)
-            king.possible_moves.append((0, 2))
+            if king != None:
+                king.possible_moves.append((0, 2))
         if ks:
             king = self.find_piece_from_coords(0, 4)
-            king.possible_moves.append((0, 6))
+            if king != None:
+                king.possible_moves.append((0, 6))
 
     def special_moves(self, piece, new_y, new_x):
         """Deals with special moves like castling and en_passant. Usually when
@@ -368,21 +381,23 @@ class Board:
             case 0:
                 piece += 'Q' 
                 self.board[new_y][new_x] = piece
+                self.promotion_piece = 'Q'
             case 1:
                 piece += 'R'
                 self.board[new_y][new_x] = piece
+                self.promotion_piece = 'R'
             case 2:
                 piece += 'N'  
                 self.board[new_y][new_x] = piece
+                self.promotion_piece = 'N'
             case 3:
                 piece += "B"
                 self.board[new_y][new_x] = piece
+                self.promotion_piece = 'B'
 
     def en_passant_generator(self):
         """Checks if white pawn has a pawn next to it that just moved its first
         two squares, then adds en passant to its possible moves."""
-        if not self.move_log:
-            return
         square = None
         last_move_index = len(self.move_log) - 1
         for piece in self.white_pieces:
@@ -390,14 +405,12 @@ class Board:
                 possible_squares = []
                 if piece.x < 7:
                     square = (piece.y, piece.x + 1)
-                    square = utils.coords_to_notation(*square)
                     possible_squares.append(square)
                 if piece.x > 0:
                     square = (piece.y, piece.x - 1)
-                    square = utils.coords_to_notation(*square)
                     possible_squares.append(square)
-                if self.move_log[last_move_index] in possible_squares:
-                    coords = utils.notation_to_coords(self.move_log[last_move_index])
+                if self.last_move[1] in possible_squares:
+                    coords = self.last_move[1]
                     black_piece = self.find_piece_from_coords(*coords)
                     if black_piece.piece_type == "bP":
                         if self.last_move[0][0] == 1:
@@ -421,12 +434,6 @@ class Board:
                         if self.last_move[0][0] == 6:
                             piece.possible_moves.append((white_piece.y + 1, white_piece.x))
                 
-
-                        
-            
-        
-
-
 
     def checkmate(self): # Looks at move counter/check status and determines if checkmate is present
         pass

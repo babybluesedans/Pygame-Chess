@@ -2,7 +2,7 @@ SQUARES = 64
 SQUARES_SIDE = 8
 
 screen_size = width, height = 800, 800
-board_size = int(height * .9)
+board_size = int(height * .8)
 while board_size % 8 != 0:
     board_size += 1
 square_size = board_size // 8
@@ -19,4 +19,5 @@ promotion_piece_start = promotion_left + promotion_x_margin + ((square_size / 2)
                                                                 - piece_size)
 promotion_piece_gap = square_size + promotion_x_margin
 promotion_rects = []
+move_log_top = board_size + ((height - board_size) * .65)
 

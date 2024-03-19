@@ -4,9 +4,7 @@ pygame
 Entry Point:
 main.py
 
-First attempt at a chess game. Game rendered using Pygame. Legal moves enforced, move log in terminal Upcoming features include:
-
-FullScreen or resizeable window
+First attempt at a chess game. Game rendered using Pygame. Legal moves enforced, move log, castling, en passant, the whole shebang Upcoming features include:
 
 Piece art options/board options
 
@@ -14,4 +12,10 @@ Board flipping
 
 Better UI
 
-A window caption! Because I have yet to be bothered
+An "AI"
+
+A better Ai (stockfish probably)
+
+Menus
+
+Game review
