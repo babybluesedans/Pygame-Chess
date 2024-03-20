@@ -4,6 +4,8 @@ pygame
 Entry Point:
 main.py
 
+test.py to try command line move parser
+
 First attempt at a chess game. Game rendered using Pygame. Legal moves enforced, move log, castling, en passant, the whole shebang. Upcoming features include:
 
 Piece art options/board options
