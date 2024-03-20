@@ -60,13 +60,6 @@ class Pawn(Piece):
                             possible_moves.append((y + 1, x + 1))
         return possible_moves
 
-
-    def en_passant(self): # Determines if En Passant is possible and amends the move list
-        pass
-
-    def promotion(self): # Determines if a move is a promotion
-        pass
-
 class Knight(Piece):
     def __init__(self, color, position, piece_type, board):
         super().__init__(color, position, piece_type, board)

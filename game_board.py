@@ -210,7 +210,6 @@ class Board:
             second_piece = None
             for pieces in self.last_board.white_pieces + self.last_board.black_pieces:
                 if piece.piece_type == pieces.piece_type:
-                    print("test")
                     if self.last_move[1] in pieces.possible_moves:
                         piece_counter += 1
                         if pieces.position != self.last_move[0]:
@@ -252,7 +251,6 @@ class Board:
         self.move_display.insert(0, message)
         if len(self.move_display) > 6:
             self.move_display.pop()
-        print(message)
     
 
     def update_castling_flags(self, piece):
@@ -461,7 +459,6 @@ class Board:
         """Parses chess move notation to make a move. Useful for CLI 
         moves and for AI communication"""
          #basically a notation parser
-        print(f"attempting move {move}")
         for i in range(len(move) - 1):
             if move[i] == 'x': #removes capture status, not important
                 temp_string = move[:i] + move[i + 1:]
