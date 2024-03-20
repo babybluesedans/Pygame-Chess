@@ -40,10 +40,6 @@ while running:
         piece = board.notation_to_move(move)
         if piece:
             print("success!")
-            #board.update_castling_flags(piece)
-            #promotion = board.is_move_promotion(piece, *new_square)
-            #board.special_moves(piece, *new_square)
-            #board.move(*square, *new_square)
             board.white_to_move = not board.white_to_move
             board.generate_legal_moves()
             board.update_move_log(piece)
