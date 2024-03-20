@@ -37,6 +37,7 @@ class Board:
         self.en_passant = False
         self.capture = False
         self.promotion_piece = ""
+        self.last_board = copy.deepcopy(self)
     
     def move(self, initial_y, initial_x, new_y, new_x): 
         """Move a piece to a square, update old square, move aux piece (castling, etc)
@@ -201,6 +202,28 @@ class Board:
                 self.en_passant = False
         else:
             message += (piece.symbol)
+        
+        if piece.symbol == 'R' or piece.symbol == "N" or piece.symbol == "Q":
+            # long bit of code to detect if multiple pieces of the same can move
+            # to the same square, so that i can add a rank or file to notation
+            piece_counter = 0
+            second_piece = None
+            for pieces in self.last_board.white_pieces + self.last_board.black_pieces:
+                if piece.piece_type == pieces.piece_type:
+                    print("test")
+                    if self.last_move[1] in pieces.possible_moves:
+                        piece_counter += 1
+                        if pieces.position != self.last_move[0]:
+                            second_piece = pieces
+            if piece_counter > 1:
+                position = utils.coords_to_notation(*self.last_move[0])
+                if self.last_move[0][1] == second_piece.x:
+                    message += position[1]
+                else:
+                    message += position[0]
+                
+                
+            
 
         if self.capture:
             message += ("x")
@@ -434,13 +457,107 @@ class Board:
                         if self.last_move[0][0] == 6:
                             piece.possible_moves.append((white_piece.y + 1, white_piece.x))
                 
+    def notation_to_move(self, move=None):
+        """Parses chess move notation to make a move. Useful for CLI 
+        moves and for AI communication"""
+         #basically a notation parser
+        print(f"attempting move {move}")
+        for i in range(len(move) - 1):
+            if move[i] == 'x': #removes capture status, not important
+                temp_string = move[:i] + move[i + 1:]
+                move = temp_string
+        length = len(move)
+        if move[length - 1] == "+" or move[length - 1] == "#":
+            length =- 1 #removes check statuses, not important for moving piece
 
-    def checkmate(self): # Looks at move counter/check status and determines if checkmate is present
-        pass
+        if length == 2: #pawn move
+            square = utils.notation_to_coords(move)
+            for piece in self.white_pieces + self.black_pieces:
+                if piece.symbol == "P":
+                    if square in piece.legal_moves:
+                        self.last_board = copy.deepcopy(self)
+                        self.update_castling_flags(piece)
+                        self.special_moves(piece, *square)
+                        self.move(*piece.position, *square)
+                        return piece
 
-
-    def stalemate(self): # Looks at move counter/check status and determines if stalemate is present
-        pass
+        if move == "O-O": # ks castle
+            for piece in self.white_pieces + self.black_pieces:
+                if piece.symbol == "K":
+                    for moves in piece.legal_moves:
+                        if moves[1] == piece.x + 2:
+                            self.last_board = copy.deepcopy(self)
+                            self.update_castling_flags(piece)
+                            self.special_moves(piece, *moves)
+                            self.move(*piece.position, *moves)
+                            return piece
         
+        if move == 'O-O-O': # qs castle
+            for piece in self.white_pieces + self.black_pieces:
+                if piece.symbol == "K":
+                    for moves in piece.legal_moves:
+                        if moves[1] == piece.x - 2:
+                            self.last_board = copy.deepcopy(self)
+                            self.update_castling_flags(piece)
+                            self.special_moves(piece, *moves)
+                            self.move(*piece.position, *moves)
+                            return piece
+        
+        if move[0].isupper(): #Not a pawn
+            if length == 3:
+                notation = ''
+                notation += move[1] + move[2]
+                square = utils.notation_to_coords(notation)
+                for piece in self.white_pieces + self.black_pieces:
+                    if piece.symbol == move[0]:
+                        if square in piece.legal_moves:
+                            self.last_board = copy.deepcopy(self)
+                            self.update_castling_flags(piece)
+                            self.special_moves(piece, *square)
+                            self.move(*piece.position, *square)
+                            return piece
+            else: #EX. two rooks staring at same square
+                if move[1].isalpha(): #both on same rank
+                    x = utils.notation_to_coords(move[1])
+                    notation = ''
+                    notation += move[2] + move[3]
+                    square = utils.notation_to_coords(notation)
+                    for piece in self.white_pieces + self.black_pieces:
+                        if piece.symbol == move[0]:
+                            if piece.x == x:
+                                if square in piece.legal_moves:
+                                    self.last_board = copy.deepcopy(self)
+                                    self.update_castling_flags(piece)
+                                    self.special_moves(piece, *square)
+                                    self.move(*piece.position, *square)
+                                    return piece
+                else: #both on same file
+                    y = utils.notation_to_coords(move[1])
+                    notation = ''
+                    notation += move[2] + move[3]
+                    square = utils.notation_to_coords(notation)
+                    for piece in self.white_pieces + self.black_pieces:
+                        if piece.symbol == move[0]:
+                            if piece.y == y:
+                                if square in piece.legal_moves:
+                                    self.last_board = copy.deepcopy(self)
+                                    self.update_castling_flags(piece)
+                                    self.special_moves(piece, *square)
+                                    self.move(*piece.position, *square)
+                                    return piece
+       
+        else: #pawn capturing
+            notation = ""
+            notation += move[1] + move[2]
+            square = utils.notation_to_coords(notation)
+            for piece in self.white_pieces + self.black_pieces:
+                if square in piece.legal_moves:
+                    self.last_board = copy.deepcopy(self)
+                    self.update_castling_flags(piece)
+                    self.special_moves(piece, *square)
+                    self.move(*piece.position, *square)
+                    return piece     
+        
+        return 0
 
     

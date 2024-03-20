@@ -8,9 +8,16 @@ ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 def notation_to_coords(notation): 
     """Converts chess notation ("a4") to coordinates on the board instance (y, x).
     EX: notation_to_coords("a4") == (4, 0)"""
-    y = ranks.index(notation[1])
-    x = files.index(notation[0])
-    return (y, x)
+    length = len(notation)
+    if length == 2:
+        y = ranks.index(notation[1])
+        x = files.index(notation[0])
+        return (y, x)
+    else:
+        if notation.isdigit():
+            return ranks.index(notation)
+        else:
+            return files.index(notation)
 
 
 def coords_to_notation(y, x): 

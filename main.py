@@ -4,6 +4,7 @@ import game_board
 import game
 import gui
 import utils
+import copy
 
 p.init()
 
@@ -55,6 +56,7 @@ while running:
                 else:
                     new_square = utils.find_coords(*location)
                     if board.move_is_legal(piece, *new_square):
+                        board.last_board = copy.deepcopy(board)
                         board.update_castling_flags(piece)
                         promotion = board.is_move_promotion(piece, *new_square)
                         board.special_moves(piece, *new_square)
