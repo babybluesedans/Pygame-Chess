@@ -442,14 +442,12 @@ class Board:
                 possible_squares = []
                 if piece.x < 7:
                     square = (piece.y, piece.x + 1)
-                    square = utils.coords_to_notation(*square)
                     possible_squares.append(square)
                 if piece.x > 0:
                     square = (piece.y, piece.x - 1)
-                    square = utils.coords_to_notation(*square)
                     possible_squares.append(square)
-                if self.move_log[last_move_index] in possible_squares:
-                    coords = utils.notation_to_coords(self.move_log[last_move_index])
+                if self.last_move[1] in possible_squares:
+                    coords = self.last_move[1]
                     white_piece = self.find_piece_from_coords(*coords)
                     if white_piece.piece_type == "wP":
                         if self.last_move[0][0] == 6:
